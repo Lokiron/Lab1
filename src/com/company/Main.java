@@ -6,8 +6,34 @@ import java.lang.*;
 import java.util.stream.Collectors;
 
 public class Main {
-
-
+    private static Map<String,Integer> Sort(Map<String,Integer> Words){
+        Map<String, Integer> sortedMap = Words.entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> { throw new AssertionError(); },
+                        LinkedHashMap::new
+                ));
+        return sortedMap;
+    }
+    private static void Parse(Map<String,Integer> sortedMap,int WordCount){
+        String eol = System.getProperty("line.separator");
+        try (Writer writer = new FileWriter("somefile.csv")) {
+            for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+                Integer value = entry.getValue();
+                Float freq= (value/(float)WordCount);
+                writer.append(entry.getKey())
+                        .append(" ")
+                        .append(value.toString())
+                        .append(" ")
+                        .append(freq.toString())
+                        .append(eol);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         BufferedReader reader = null;
@@ -45,31 +71,8 @@ public class Main {
                 }
             }
         }
-        //Map<String, Integer> sortedMap =Words.entrySet().stream().sorted(Map.Entry.<String, Integer>comparingByValue().reversed()).collect(Map.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-        Map<String, Integer> sortedMap = Words.entrySet().stream()
-                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> { throw new AssertionError(); },
-                        LinkedHashMap::new
-                ));
-
-        String eol = System.getProperty("line.separator");
-        try (Writer writer = new FileWriter("somefile.csv")) {
-            for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-                Integer value = entry.getValue();
-                Float freq= (value/(float)WordCount);
-                writer.append(entry.getKey())
-                        .append(" ")
-                        .append(value.toString())
-                        .append(" ")
-                        .append(freq.toString())
-                        .append(eol);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
-        }
+        Map<String, Integer> sortedMap = Sort(Words);
+        Parse(sortedMap,WordCount);
 
 
 
